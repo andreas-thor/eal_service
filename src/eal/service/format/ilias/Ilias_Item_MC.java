@@ -37,7 +37,7 @@ public class Ilias_Item_MC extends Ilias_Item {
 			String text = (String) this.xpath.evaluate("./material/mattext/text()", xmlLabel, XPathConstants.STRING);
 
 			answerIds.add(id);
-			this.item.answers.add(this.item.new Answer(text));
+			this.item.addAnswer(text);
 		}
 
 		NodeList xmlResps = (NodeList) xpath.evaluate("./resprocessing/respcondition", xmlNode, XPathConstants.NODESET);
@@ -45,41 +45,19 @@ public class Ilias_Item_MC extends Ilias_Item {
 			Node xmlResp = xmlResps.item(index);
 
 			String points = (String) this.xpath.evaluate("./setvar[@action=\"Add\"]/text()", xmlResp, XPathConstants.STRING);
-
+			
 			String id = (String) this.xpath.evaluate("./conditionvar/varequal/text()", xmlResp, XPathConstants.STRING);
-			int idPos = answerIds.indexOf(id);
-			if (idPos >= 0) {
-				try {
-					this.item.answers.get(idPos).points_pos = Integer.valueOf(points);
-				} catch (NumberFormatException e) {
-				}
-			}
+			this.item.setAnswerPoints(answerIds.indexOf(id), true, points);
 			
 			id = (String) this.xpath.evaluate("./conditionvar/varequal/not/text()", xmlResp, XPathConstants.STRING);
-			idPos = answerIds.indexOf(id);
-			if (idPos >= 0) {
-				try {
-					this.item.answers.get(idPos).points_neg = Integer.valueOf(points);
-				} catch (NumberFormatException e) {
-				}
-			}
+			this.item.setAnswerPoints(answerIds.indexOf(id), false, points);
 		}
 
 		
 		String min = (String) this.xpath.evaluate("./presentation/flow/response_lid/render_choice/@minnumber", xmlNode, XPathConstants.STRING);
 		String max = (String) this.xpath.evaluate("./presentation/flow/response_lid/render_choice/@maxnumber", xmlNode, XPathConstants.STRING);
-
-		try {
-			this.item.minnumber = Integer.valueOf(min);
-		} catch (NumberFormatException e) {
-			this.item.minnumber = 0;
-		}
-		
-		try {
-			this.item.maxnumber = Integer.valueOf(max);
-		} catch (NumberFormatException e) {
-			this.item.maxnumber = this.item.answers.size();
-		}
+		this.item.setMinNumber(min);
+		this.item.setMaxNumber(max);
 	
 		
 	}

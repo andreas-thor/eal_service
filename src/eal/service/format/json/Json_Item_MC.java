@@ -22,17 +22,17 @@ public class Json_Item_MC extends Json_Item {
 		res.put("type", "MC");
 		
 		JSONArray ja = new JSONArray();
-		for (int index=0; index<item.answers.size(); index++) {
+		for (int index=0; index<item.getNumberOfAnswers(); index++) {
 			JSONObject o = new JSONObject();
-			o.put("text", item.answers.get(index).text);
-			o.put("points_pos", item.answers.get(index).points_pos);
-			o.put("points_neg", item.answers.get(index).points_neg);
+			o.put("text", item.getAnswerText(index));
+			o.put("points_pos", item.getAnswerPoints(index, true));
+			o.put("points_neg", item.getAnswerPoints(index, false));
 			ja.put(o);
 		}
 		res.put("answers", ja);
 		
-		res.put("minnumber", this.item.minnumber);
-		res.put("maxnumber", this.item.maxnumber);
+		res.put("minnumber", this.item.getMinNumber());
+		res.put("maxnumber", this.item.getMaxNumber());
 		
 		return res;
 

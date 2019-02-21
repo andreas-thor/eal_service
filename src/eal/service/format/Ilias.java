@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -22,7 +24,7 @@ import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import eal.service.format.eal.Item;
-import eal.service.format.ilias.Ilias_Import_Export;
+import eal.service.format.ilias.Ilias_Import;
 import eal.service.format.json.Json_Import_Export;
 import eal.service.format.json.Json_Item_SC;
 
@@ -46,8 +48,8 @@ public class Ilias extends HttpServlet {
 		Part part = request.getPart("file");
 
 		try {
-			List<Item> items = Ilias_Import_Export.parse(getFileName(part), getZipContent(part.getInputStream()));
-			JSONObject json = Json_Import_Export.create(items);
+			Stream<Item> items = new Ilias_Import(getFileName(part), part.getInputStream()).parse();
+			JSONObject json = new Json_Import_Export().create(items);
 			
 			response.getWriter().append(json.toString());
 			
@@ -73,32 +75,7 @@ public class Ilias extends HttpServlet {
 
 	}
 
-	private Map<String, StringBuilder> getZipContent(InputStream in) throws IOException {
-
-		Map<String, StringBuilder> result = new HashMap<String, StringBuilder>();
-
-		// create a buffer to improve copy performance later.
-		byte[] buffer = new byte[2048];
-
-		// open the zip file stream
-		ZipInputStream stream = new ZipInputStream(in);
-		// now iterate through each item in the stream. The get next entry call will
-		// return a ZipEntry for each file in the stream
-		ZipEntry entry;
-		while ((entry = stream.getNextEntry()) != null) {
-			// Once we get the entry from the stream, the stream is positioned read to read
-			// the raw data, and we keep reading until read returns 0 or less.
-			StringBuilder sb = new StringBuilder();
-			int len = 0;
-			while ((len = stream.read(buffer)) > 0) {
-				sb.append(new String(buffer, 0, len));
-			}
-
-			result.put(entry.getName(), sb);
-		}
-		stream.close();
-		return result;
-	}
+	
 
 	/**
 	 * Utility method to get file name from HTTP header content-disposition

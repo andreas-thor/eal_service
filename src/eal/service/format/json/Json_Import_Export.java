@@ -1,6 +1,8 @@
 package eal.service.format.json;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -9,18 +11,11 @@ import eal.service.format.eal.Item;
 
 public class Json_Import_Export {
 
-	
-	
-	public static JSONObject create (List<Item> items) throws Exception {
-		
-		JSONArray json_items = new JSONArray();
-		for (Item i: items) {
-			json_items.put(Json_Item.create (i));
-		}
-		
+	public JSONObject create(Stream<Item> items) throws Exception {
+
 		JSONObject res = new JSONObject();
-		res.put("items", json_items);
+		res.put("items", new JSONArray(items.map(Json_Item::create).filter(Objects::nonNull).collect(Collectors.toList())));
 		return res;
-		
+
 	}
 }

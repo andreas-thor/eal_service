@@ -22,10 +22,10 @@ public class Json_Item_SC extends Json_Item {
 		res.put("type", "item_SC");
 
 		JSONArray ja = new JSONArray();
-		for (int index=0; index<item.answers.size(); index++) {
+		for (int index=0; index<item.getNumberOfAnswers(); index++) {
 			JSONObject o = new JSONObject();
-			o.put("text", item.answers.get(index).text);
-			o.put("points", item.answers.get(index).points);
+			o.put("text", item.getAnswerText(index));
+			o.put("points", item.getAnswerPoints(index));
 			ja.put (o);
 		}
 		

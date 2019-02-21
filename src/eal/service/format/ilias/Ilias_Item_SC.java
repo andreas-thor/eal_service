@@ -29,9 +29,8 @@ public class Ilias_Item_SC extends Ilias_Item {
 			Node xmlLabel = xmlLabels.item(index);
 			String id = (String) this.xpath.evaluate("./@ident", xmlLabel, XPathConstants.STRING);
 			String text = (String) this.xpath.evaluate("./material/mattext/text()", xmlLabel, XPathConstants.STRING);
-			
 			answerIds.add(id);
-			this.item.answers.add(this.item.new Answer(text));
+			this.item.addAnswer(text);
 		} 
 		
 		NodeList xmlResps = (NodeList) xpath.evaluate("./resprocessing/respcondition", xmlNode, XPathConstants.NODESET);
@@ -39,10 +38,7 @@ public class Ilias_Item_SC extends Ilias_Item {
 			Node xmlResp = xmlResps.item(index);
 			String id = (String) this.xpath.evaluate("./conditionvar/varequal/text()", xmlResp, XPathConstants.STRING);
 			String points = (String) this.xpath.evaluate("./setvar[@action=\"Add\"]/text()", xmlResp, XPathConstants.STRING);
-			try {
-				this.item.answers.get(answerIds.indexOf(id)).points = Integer.valueOf(points);
-			} catch (NumberFormatException e) {
-			}
+			this.item.setAnswerPoints(answerIds.indexOf(id), points);
 		}
 		
 	}

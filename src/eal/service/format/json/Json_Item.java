@@ -18,6 +18,7 @@ public abstract class Json_Item {
 		if (this.getItem().ealid != null) {
 			result.put("ealid", this.getItem().ealid);
 		}
+		result.put("title", this.getItem().title);
 		result.put("description", this.getItem().description);
 		result.put("question", this.getItem().question);
 		result.put("points", this.getItem().getPoints());
@@ -25,7 +26,7 @@ public abstract class Json_Item {
 	}
 
 
-	public static JSONObject create(Item item) throws Exception {
+	public static JSONObject create(Item item) {
 		
 		if (item instanceof Item_SC) {
 			return new Json_Item_SC((Item_SC) item).toJSON();
@@ -37,6 +38,6 @@ public abstract class Json_Item {
 			return new Json_Item_FT((Item_FT) item).toJSON();
 		}
 		
-		throw new Exception("Unknown item type");
+		return null;
 	}
 }
