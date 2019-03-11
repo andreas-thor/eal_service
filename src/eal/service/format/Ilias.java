@@ -48,10 +48,11 @@ public class Ilias extends HttpServlet {
 		Part part = request.getPart("file");
 
 		try {
-			Stream<Item> items = new Ilias_Import(getFileName(part), part.getInputStream()).parse();
-			JSONObject json = new Json_Import_Export().create(items);
+			Item[] items = new Ilias_Import().parse(getFileName(part), part.getInputStream());
+			response.setCharacterEncoding("UTF-8");
+			new Json_Import_Export().create(items, response.getOutputStream());
 			
-			response.getWriter().append(json.toString());
+//			response.getWriter().append(json.toString());
 			
 		} catch (XPathExpressionException | SAXException | ParserConfigurationException e) {
 			// TODO Auto-generated catch block

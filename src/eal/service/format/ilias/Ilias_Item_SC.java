@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -18,7 +19,7 @@ public class Ilias_Item_SC extends Ilias_Item {
 	private Item_SC item;
 	
 	
-	public Ilias_Item_SC (Node xmlNode) throws XPathExpressionException {
+	public Ilias_Item_SC (Element xmlNode) throws XPathExpressionException {
 		
 		this.item = new Item_SC();
 		List<String> answerIds = new ArrayList<String>();

@@ -1,11 +1,17 @@
 package eal.service.format.ilias;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.json.JSONObject;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import eal.service.format.eal.Item;
@@ -16,11 +22,11 @@ public abstract class Ilias_Item  {
 	
 	public XPath xpath;
 	public String xmlid;
-	
+	public Document doc;
 	
 	public abstract Item getItem();
 	
-	public void parse(Node xmlNode) throws XPathExpressionException {
+	public void parse(Element xmlNode) throws XPathExpressionException {
 		
 		this.xpath = XPathFactory.newInstance().newXPath();
 		this.xmlid = (String) this.xpath.evaluate("./@ident", xmlNode, XPathConstants.STRING);
@@ -40,7 +46,20 @@ public abstract class Ilias_Item  {
 		}
 	}
 	
+	public Node toXML () throws ParserConfigurationException {
 	
+		
+		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+		Element result = doc.createElement("item");
+		
+		result.setAttribute("ident", this.xmlid);
+		
+		
+		
+		
+		return result;
+	}
 	
 
 

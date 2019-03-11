@@ -1,21 +1,17 @@
 package eal.service.format.ilias;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import eal.service.format.eal.Item;
 import eal.service.format.eal.Item_MC;
-import eal.service.format.eal.Item_SC;
 
 
 public class Ilias_Item_MC extends Ilias_Item {
@@ -23,7 +19,7 @@ public class Ilias_Item_MC extends Ilias_Item {
 	private Item_MC item;
 
 	
-	public Ilias_Item_MC(Node xmlNode) throws XPathExpressionException {
+	public Ilias_Item_MC(Element xmlNode) throws XPathExpressionException {
 		
 		this.item = new Item_MC();
 		parse(xmlNode);
