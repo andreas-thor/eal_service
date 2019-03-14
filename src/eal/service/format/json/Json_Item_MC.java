@@ -19,7 +19,7 @@ public class Json_Item_MC extends Json_Item {
 	public JSONObject toJSON() {
 		JSONObject res = super.toJSON();
 
-		res.put("type", "MC");
+		res.put("type", "item_MC");
 		
 		JSONArray ja = new JSONArray();
 		for (int index=0; index<item.getNumberOfAnswers(); index++) {

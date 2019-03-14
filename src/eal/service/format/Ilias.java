@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import eal.service.format.eal.Item;
+import eal.service.format.ilias.Ilias_Export;
 import eal.service.format.ilias.Ilias_Import;
 import eal.service.format.json.Json_Import_Export;
 import eal.service.format.json.Json_Item_SC;
@@ -49,8 +50,20 @@ public class Ilias extends HttpServlet {
 
 		try {
 			Item[] items = new Ilias_Import().parse(getFileName(part), part.getInputStream());
-			response.setCharacterEncoding("UTF-8");
-			new Json_Import_Export().create(items, response.getOutputStream());
+
+//			response.setCharacterEncoding("UTF-8");
+//			new Json_Import_Export().create(items, response.getOutputStream());
+			
+			
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + "hhh.zip" + "\"");
+	        response.setHeader("Content-Type", "application/zip");
+
+//	        response.getOutputStream().write(baos.toByteArray());
+//	        response.flushBuffer();
+//	        baos.close();
+	        
+			
+			new Ilias_Export().create(items, response.getOutputStream());
 			
 //			response.getWriter().append(json.toString());
 			

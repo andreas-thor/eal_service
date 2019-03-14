@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -70,7 +69,7 @@ public class Ilias_Import implements Importer {
 		
 		Map<String, Integer> mapXML2EAL = getMappingXMLID2EALID();
 		return parseQTI().map(it -> {
-			it.getItem().ealid = mapXML2EAL.get(it.xmlid);
+			it.getItem().ealid = mapXML2EAL.get(it.xmlIdent);
 			return it.getItem();
 		}).toArray(Item[]::new);
 		
@@ -110,30 +109,6 @@ public class Ilias_Import implements Importer {
 
 	}
 
-	private Document createQPLFile(Stream<Item> items) throws ParserConfigurationException, SAXException, IOException {
-
-		
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
-		builder = factory.newDocumentBuilder();
-			
-		Document qplDoc = builder.parse(getClass().getResourceAsStream("Ilias_QPL.xml"));
-		AtomicInteger index = new AtomicInteger(0);
-		items.forEach(item -> {
-			Element xml_PO = qplDoc.createElement("PageObject");
-			Element xml_PC = qplDoc.createElement("PageContent");
-			xml_PC.setAttribute("PCID", "EAL:" + item.ealid);
-			Element xml_QU = qplDoc.createElement("Question");
-			xml_QU.setAttribute("QRef", String.valueOf(index.getAndIncrement()));
-			xml_PC.appendChild(xml_QU);
-			xml_PO.appendChild (xml_PC);
-			qplDoc.getDocumentElement().appendChild(xml_PO);
-		});
-		
-		
-		return qplDoc;
-	}
-
 	private Document getQTIDocument() throws SAXException, IOException {
 
 		for (String type : new String[] { "_qpl_", "_tst_" }) {
@@ -147,23 +122,32 @@ public class Ilias_Import implements Importer {
 
 	private Ilias_Item parseItem(Element xmlItem) {
 
+		Ilias_Item result = null;
 		try {
 			String type = (String) xpath.evaluate(".//qtimetadatafield[./fieldlabel='QUESTIONTYPE']/fieldentry", xmlItem, XPathConstants.STRING);
 
 			switch (type) {
-			case "SINGLE CHOICE QUESTION":
-				return new Ilias_Item_SC(xmlItem);
-			case "MULTIPLE CHOICE QUESTION":
-				return new Ilias_Item_MC(xmlItem);
-			case "TEXT QUESTION":
-				return new Ilias_Item_FT(xmlItem);
+			case Ilias_Item_SC.type:
+				result = new Ilias_Item_SC();
+				break;
+			case Ilias_Item_MC.type: 
+				result = new Ilias_Item_MC();
+				break;
+			case Ilias_Item_FT.type:
+				result = new Ilias_Item_FT();
+				break;
 			default:
 				return null;
 			}
+			
+			result.parse(xmlItem);
+			return result;
+			
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 			return null;
 		}
+		
 	}
 
 	

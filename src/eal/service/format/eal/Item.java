@@ -6,7 +6,7 @@ public abstract class Item {
 	public String title = null;
 	public String description = null;
 	public String question = null;
-
+	
 	public abstract int getPoints();
 	
 	
