@@ -1,9 +1,9 @@
 package eal.service.format.ilias;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -33,7 +33,7 @@ import eal.service.format.eal.Item;
 public class Ilias_Import implements Importer {
 
 	private String name;
-	private Map<String, StringBuilder> content;
+	private Map<String, byte[]> content;
 	private DocumentBuilder builder;
 	private XPath xpath;
 
@@ -69,7 +69,9 @@ public class Ilias_Import implements Importer {
 		
 		Map<String, Integer> mapXML2EAL = getMappingXMLID2EALID();
 		return parseQTI().map(it -> {
+			// set ealid if available
 			it.getItem().ealid = mapXML2EAL.get(it.xmlIdent);
+			
 			return it.getItem();
 		}).toArray(Item[]::new);
 		
@@ -91,7 +93,7 @@ public class Ilias_Import implements Importer {
 
 		Map<String, Integer> result = new HashMap<String, Integer>();
 
-		Document mainFileDoc = builder.parse(new ByteArrayInputStream(this.content.get(this.name + "/" + this.name + ".xml").toString().getBytes(StandardCharsets.UTF_8)));
+		Document mainFileDoc = builder.parse(new ByteArrayInputStream(this.content.get(this.name + "/" + this.name + ".xml")/*.toString().getBytes(StandardCharsets.UTF_8)*/));
 		NodeList questions = (NodeList) xpath.evaluate("//PageObject/PageContent/Question", mainFileDoc, XPathConstants.NODESET);
 
 		for (int index = 0; index < questions.getLength(); index++) {
@@ -114,7 +116,7 @@ public class Ilias_Import implements Importer {
 		for (String type : new String[] { "_qpl_", "_tst_" }) {
 			if (this.name.contains(type)) {
 				String nameQTIFile = this.name + "/" + this.name.replaceAll(type, "_qti_") + ".xml";
-				return builder.parse(new ByteArrayInputStream(this.content.get(nameQTIFile).toString().getBytes(StandardCharsets.UTF_8)));
+				return builder.parse(new ByteArrayInputStream(this.content.get(nameQTIFile)/*.toString().getBytes(StandardCharsets.UTF_8)*/));
 			}
 		}
 		throw new IOException("Could not find qti XML file. File " + this.name + " is neither qpl nor tst!");
@@ -140,7 +142,7 @@ public class Ilias_Import implements Importer {
 				return null;
 			}
 			
-			result.parse(xmlItem);
+			result.parse(xmlItem, this.name, this.content);
 			return result;
 			
 		} catch (XPathExpressionException e) {
@@ -151,9 +153,9 @@ public class Ilias_Import implements Importer {
 	}
 
 	
-	private static Map<String, StringBuilder> getZipContent(InputStream in) throws IOException {
+	private static Map<String, byte[]> getZipContent(InputStream in) throws IOException {
 
-		Map<String, StringBuilder> result = new HashMap<String, StringBuilder>();
+		Map<String, byte[]> result = new HashMap<String, byte[]>();
 
 		// create a buffer to improve copy performance later.
 		byte[] buffer = new byte[2048];
@@ -166,13 +168,18 @@ public class Ilias_Import implements Importer {
 		while ((entry = stream.getNextEntry()) != null) {
 			// Once we get the entry from the stream, the stream is positioned read to read
 			// the raw data, and we keep reading until read returns 0 or less.
-			StringBuilder sb = new StringBuilder();
+			
+//			StringBuilder sb = new StringBuilder();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			
 			int len = 0;
 			while ((len = stream.read(buffer)) > 0) {
-				sb.append(new String(buffer, 0, len));
+//				sb.append(new String(buffer, 0, len));
+				os.write(buffer, 0, len);
 			}
 
-			result.put(entry.getName(), sb);
+//			result.put(entry.getName(), sb);
+			result.put(entry.getName(), os.toByteArray());
 		}
 		stream.close();
 		return result;

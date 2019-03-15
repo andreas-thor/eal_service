@@ -2,6 +2,7 @@ package eal.service.format.ilias;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -28,11 +29,30 @@ public class Ilias_Item_MC extends Ilias_Item {
 	public Ilias_Item_MC (Item_MC item) {
 		this.item = item;
 	}
+	
+	@Override
+	public Item getItem() {
+		return this.item;
+	}
+	
+	public Item_MC getItem_MC() {
+		return this.item;
+	}
+	
+	@Override
+	public String getType() {
+		return Ilias_Item_MC.type;
+	}
+	
+	public String getCardinality () {
+		return "Multiple";
+	}
+	
 
 	@Override
-	public void parse(Element xmlNode) throws XPathExpressionException {
+	public void parse(Element xmlNode, String name, Map<String, byte[]> content) throws XPathExpressionException {
 
-		super.parse(xmlNode);
+		super.parse(xmlNode, name, content);
 
 		List<String> answerIds = new ArrayList<String>();
 		NodeList xmlLabels = (NodeList) xpath.evaluate("./presentation/flow//response_label", xmlNode, XPathConstants.NODESET);
@@ -122,9 +142,17 @@ public class Ilias_Item_MC extends Ilias_Item {
 		
 		for (int index=0; index<getItem_MC().getNumberOfAnswers(); index++) {
 			
+			Element mattext = doc.createElement("mattext");
+			mattext.setTextContent(getItem_MC().getAnswerText(index));
+			mattext.setAttribute("texttype", "text/html");
+
+			Element material = doc.createElement("material");
+			material.appendChild(mattext);
+			
 			Element response_label = doc.createElement("response_label");
 			response_label.setAttribute("ident", String.valueOf(index));
-			response_label.appendChild (createMaterialElement(doc, "text/html", getItem_MC().getAnswerText(index)));
+			response_label.appendChild(material);
+			
 			render_choice.appendChild (response_label);
 		}
 
@@ -140,23 +168,6 @@ public class Ilias_Item_MC extends Ilias_Item {
 
 	
 
-	@Override
-	public Item getItem() {
-		return this.item;
-	}
-	
-	public Item_MC getItem_MC() {
-		return this.item;
-	}
-	
-	@Override
-	public String getType() {
-		return Ilias_Item_MC.type;
-	}
-	
-	public String getCardinality () {
-		return "Multiple";
-	}
-	
+
 	
 }

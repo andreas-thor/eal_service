@@ -55,15 +55,16 @@ public class Ilias extends HttpServlet {
 //			new Json_Import_Export().create(items, response.getOutputStream());
 			
 			
-			response.setHeader("Content-Disposition", "attachment; filename=\"" + "hhh.zip" + "\"");
-	        response.setHeader("Content-Type", "application/zip");
 
 //	        response.getOutputStream().write(baos.toByteArray());
 //	        response.flushBuffer();
 //	        baos.close();
 	        
-			
-			new Ilias_Export().create(items, response.getOutputStream());
+			String name = System.currentTimeMillis() + "__0__qpl_1";
+
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + name + ".zip\"");
+	        response.setHeader("Content-Type", "application/zip");
+			new Ilias_Export(name).create(items, response.getOutputStream());
 			
 //			response.getWriter().append(json.toString());
 			

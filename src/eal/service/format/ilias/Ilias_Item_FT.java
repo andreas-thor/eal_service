@@ -1,5 +1,7 @@
 package eal.service.format.ilias;
 
+import java.util.Map;
+
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -24,9 +26,9 @@ public class Ilias_Item_FT extends Ilias_Item {
 	}
 
 	@Override
-	public void parse(Element xmlNode) throws XPathExpressionException {
+	public void parse(Element xmlNode, String name, Map<String, byte[]> content) throws XPathExpressionException {
 		
-		super.parse(xmlNode);
+		super.parse(xmlNode, name, content);
 
 		String points = (String) this.xpath.evaluate("./resprocessing/outcomes/decvar/@maxvalue", xmlNode, XPathConstants.STRING);
 		try {
